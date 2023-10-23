@@ -1,79 +1,97 @@
 # Калькулятор системы счисления
-def again():
-    ag = input("\nЖелаете еще конвертировать число? (Да / Нет): ")
-    while ag.lower() not in ["да", "нет", "lf", "ytn"]:
-        ag = input("Некорректный ответ. Введите (Да / Нет): ")
-    if ag.lower() in ["да", "lf"]:
+def ask_user_to_work_again():
+    again = input("\nЖелаете еще конвертировать число? (Да / Нет): ")
+    while again.lower() not in ["да", "нет", "lf", "ytn"]:
+        again = input("Некорректный ответ. Введите (Да / Нет): ")
+    if again.lower() in ["да", "lf"]:
         return True
     else:
         return False
 
 
-def valid_base(base: str, base_ch: int):
-    while not base.isdigit() or not (1 < int(base) < 37 and int(base) != base_ch):
-        base = input('Некорректное значение.\nВведите число от 2 до 36' + f', исключая {base_ch}'
-                     * (base == str(base_ch)) + ': ')
+def is_base_valid(base: str, base_old: int):
+    while not base.isdigit() or not (1 < int(base) < 37 and int(base) != base_old):
+        base = input(
+            "Некорректное значение.\nВведите число от 2 до 36"
+            + f", исключая {base_old}" * (base == str(base_old))
+            + ": "
+        )
 
     return int(base)
 
 
-def valid_num(base: int):
+def is_num_valid(base: int):
     flag = True
-    simb = '0123456789ABCDEFGHIJKLMNPQRSTUYVWXYZ'  # Допустимые символы
-    print('\n2. Введите исходное число: ', end='')
+    symbols = "0123456789ABCDEFGHIJKLMNPQRSTUYVWXYZ"  # Допустимые символы
+    print("\n2. Введите исходное число: ", end="")
     while flag:
-        n = input()
+        num = input()
         flag = False
-        for i in n:
-            if i.upper() not in simb[:base]:
+        for i in num:
+            if i.upper() not in symbols[:base]:
                 flag = True
-                print(f'\nНекорректное значение. Допустимые символы для основания {base}: "{simb[:base]}".')
-                print('Введите число заново: ', end='')
+                print(
+                    f'\nНекорректное значение. Допустимые символы для основания {base}: "{symbols[:base]}".'
+                )
+                print("Введите число заново: ", end="")
                 break
 
-    return n
+    return num
 
 
-def to_dec(num: str, base: int):  # Перевод в 10-ую
+def to_decimal(num: str, base: int):  # Перевод в 10-ую
     return int(num, base)
 
 
 def to_base(num: str, base_old: int, base_new: int):  # Для всех, кроме 10-ой
-    num = to_dec(num, base_old)
-    res = ''
+    num = to_decimal(num, base_old)
+    result = ""
     while num:
-        ost = num % base_new
-        res = str(num % base_new) * (ost < 10) + chr(ord('A') - 10 + ost) * (ost > 9) + res
+        remainder = num % base_new
+        result = (
+            str(num % base_new) * (remainder < 10)
+            + chr(ord("A") - 10 + remainder) * (remainder > 9)
+            + result
+        )
         num //= base_new
 
-    return res
+    return result
 
 
-def settings():
-    sett = list()
-    sett.append(valid_base(input('\n1. Введите исходное основание: '), 0))
-    sett.append(valid_num(sett[0]))
-    sett.append(valid_base(input('\n3. Введите новое основание: '), sett[0]))
+def get_user_settings(): 
+    settings = list()
+    settings.append(is_base_valid(input("\n1. Введите исходное основание: "), 0))
+    settings.append(is_num_valid(settings[0]))
+    settings.append(is_base_valid(input("\n3. Введите новое основание: "), settings[0]))
 
-    return sett
+    return settings
 
 
-def start():
-    print('-' * 38, '\nЗапущен калькулятор системы счисления.\nОпределите следующие настройки:\n', '-' * 38, sep='')
+def main():
+    print(
+        "-" * 38,
+        "\nЗапущен калькулятор системы счисления.\nОпределите следующие настройки:\n",
+        "-" * 38,
+        sep="",
+    )
 
     flag = True
     while flag:
-        setts = settings()
-        if setts[2] == 10:
-            print(f'Число {setts[1].upper()} с основанием {setts[0]} конвертировано в число {to_dec(setts[1], setts[0])} с основанием {setts[0]}.')
+        settings = get_user_settings()
+        if settings[2] == 10:
+            print(
+                f"Число {settings[1].upper()} с основанием {settings[0]} конвертировано в число {to_decimal(settings[1], settings[0])} с основанием {settings[0]}."
+            )
 
         else:
-            print(f'Число {setts[1].upper()} с основанием {setts[0]} конвертировано в число {to_base(setts[1], setts[0], setts[2])} с основанием {setts[2]}.')
+            print(
+                f"Число {settings[1].upper()} с основанием {settings[0]} конвертировано в число {to_base(settings[1], settings[0], settings[2])} с основанием {settings[2]}."
+            )
 
-        flag = again()
+        flag = ask_user_to_work_again()
 
     print()
-    print('-' * 38, '\nПрограмма завершена.\n', '-' * 38, sep='')
+    print("-" * 38, "\nПрограмма завершена.\n", "-" * 38, sep="")
 
 
-start()
+main()

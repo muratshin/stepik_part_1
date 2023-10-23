@@ -3,64 +3,56 @@ from random import *
 
 def greets():
     print(
-        '\nПриветствую Вас генераторе паролей! \nОтветьте на нижеследующие вопросы для формирования пароля.'
+        "\n"
+        "Приветствую Вас генераторе паролей! \n"
+        "Ответьте на нижеследующие вопросы для формирования пароля."
     )
 
 
-def chars_gen(el):
-    dig = '0123456789'
-    upp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    low = 'abcdefghijklmnopqrstuvwxyz'
-    sim = '!#$%&*+-=?@^_'
-    unc = 'il1Lo0O'
+def chars_gen(elem: bool):
+    digits = "0123456789"
+    upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    lower_case = "abcdefghijklmnopqrstuvwxyz"
+    symbols = "!#$%&*+-=?@^_"
+    unwanted_simbols = "il1Lo0O"
 
-    if not el:
-        for _ in unc:
-            dig = dig.replace(_, '')
-            upp = upp.replace(_, '')
-            low = low.replace(_, '')
+    if not elem:  # Удаление неоднозначных символов
+        for i in unwanted_simbols:
+            digits = digits.replace(i, "")
+            upper_case = upper_case.replace(i, "")
+            lower_case = lower_case.replace(i, "")
 
-    return dig, upp, low, sim
-
-
-def choose_dig(req, n):
-    while not req.isdigit() or int(req) < n:
-        req = input(f"Некорректный ввод. Введите число от {n}: ")
-
-    return int(req)
+    return digits, upper_case, lower_case, symbols
 
 
-def choose_yn(req):
-    while req.lower() not in ["да", "нет", "lf", "ytn"]:
-        req = input("Некорректный ответ. Введите (Да / Нет): ")
-    if req.lower() in ["да", "lf"]:
+def is_digit_valid(request, n):
+    while not request.isdigit() or int(request) < n:
+        request = input(f"Некорректный ввод. Введите число от {n}: ")
+
+    return int(request)
+
+
+def is_request_valid(request):
+    while request.lower() not in ["да", "нет", "lf", "ytn"]:
+        request = input("Некорректный ответ. Введите (Да / Нет): ")
+    if request.lower() in ["да", "lf"]:
         return True
     else:
         return False
 
 
-def pass_gen(lp, ans, chrs):  # С гарантированным наличием символов из каждой группы
+def pass_geneneration(length_pass: int, answers: list, chars: list):
     password = []
-    counter = sum(ans[:-1])  # Исключаем ответ с использованием неоднозначных символов
-    pool = ''.join([chrs[i] for i in range(4) if ans[i]])
+    # Исключаем ответ с использованием неоднозначных символов
+    counter = sum(answers[:-1])
+    pool = "".join([chars[i] for i in range(4) if answers[i]])
 
-    if ans[0]:
-        for _ in range(lp // counter):
-            password.append(choice(chrs[0]))
+    for i in range(4):  # С гарантированным наличием символов из каждой группы
+        if answers[i]:
+            for j in range(length_pass // counter):
+                password.append(choice(chars[i]))
 
-    if ans[1]:
-        for _ in range(lp // counter):
-            password.append(choice(chrs[1]))
-
-    if ans[2]:
-        for _ in range(lp // counter):
-            password.append(choice(chrs[2]))
-
-    if ans[3]:
-        for _ in range(lp // counter):
-            password.append(choice(chrs[3]))
-
-    for _ in range(lp % counter):
+    for k in range(length_pass % counter):
         password.append(choice(pool))
 
     shuffle(password)
@@ -68,24 +60,34 @@ def pass_gen(lp, ans, chrs):  # С гарантированным наличие
     return password
 
 
-def settings():
-    chars = []  # Список используемых символов
-    quest = []  # Список значений по вопросам
+def main():
+    chars_for_password = []  # Список используемых символов
+    settings = []  # Список значений по вопросам
+    questions = [
+        "3. Использовать цифры? (Да / Нет) ",
+        "4. Использовать прописные буквы? (Да / Нет) ",
+        "5. Использовать строчные буквы? (Да / Нет) ",
+        '6. Использовать символы "!#$%&*+-=?@^_"? (Да / Нет) ',
+        '7. Использовать неоднозначные символы "il1Lo0O"? (Да / Нет) ',
+    ]
     greets()
-    qwn = choose_dig(input('1. Введите необходимое количество паролей: '), 1)
-    lg = choose_dig(input('2. Введите необходимую длину пароля: '), 8)
-    quest.append(choose_yn(input('3. Использовать цифры? (Да / Нет) ')))
-    quest.append(choose_yn(input('4. Использовать прописные буквы? (Да / Нет) ')))
-    quest.append(choose_yn(input('5. Использовать строчные буквы? (Да / Нет) ')))
-    quest.append(choose_yn(input('6. Использовать символы "!#$%&*+-=?@^_"? (Да / Нет) ')))
-    quest.append(choose_yn(input('7. Использовать неоднозначные символы "il1Lo0O"? (Да / Нет) ')))
+    count_of_passwords = is_digit_valid(
+        input("1. Введите необходимое количество паролей: "), 1
+    )
+    length_of_password = is_digit_valid(
+        input("2. Введите необходимую длину пароля: "), 8
+    )
+    for i in range(5):
+        settings.append(is_request_valid(input(f"{questions[i]}")))
 
-    chars.extend(chars_gen(quest[4]))  # Генерация списка символов
+    chars_for_password.extend(chars_gen(settings[4]))  # Генерация списка символов
 
-    print('\nВывожу сгенерированные пароли:\n')
+    print("\nВывожу сгенерированные пароли:\n")
 
-    for _ in range(qwn):
-        print(*pass_gen(lg, quest, chars), sep='')
+    for _ in range(count_of_passwords):
+        print(
+            *pass_geneneration(length_of_password, settings, chars_for_password), sep=""
+        )
 
 
-settings()  # Старт программы
+main()  # Старт программы
