@@ -44,7 +44,7 @@ def ask_user_for_game_parameters():
     return int(start_range), int(end_range)
 
 
-def valid(start_range, end_range):
+def is_digit_valid(start_range, end_range):
     n = input("\nВведите предполагаемое число: ")
     while not (n.isdigit() and start_range <= int(n) <= end_range):
         n = input(
@@ -59,18 +59,18 @@ def game_pc(start_range, end_range):  # против компьютера
     key, counter = randint(start_range, end_range), 1
     flag = True
     print(f"\nОтладка ключ: {key}.")
-    req = valid(start_range, end_range)
+    req = is_digit_valid(start_range, end_range)
 
     while flag:
         if req > key:
             counter += 1
             print("\nНет. Загаданное число меньше введенного.")
-            req = valid(start_range, end_range)
+            req = is_digit_valid(start_range, end_range)
 
         elif req < key:
             counter += 1
             print("\nНет. Загаданное число больше введенного.")
-            req = valid(start_range, end_range)
+            req = is_digit_valid(start_range, end_range)
 
         else:
             flag = False
